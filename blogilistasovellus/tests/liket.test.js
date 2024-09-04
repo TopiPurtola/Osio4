@@ -2,6 +2,7 @@ const { test, describe } = require('node:test')
 const assert = require('node:assert')
 const listHelper = require('../utils/list_helper')
 
+
 describe('total likes', () => {
     const listWithOneBlog = [
       {
@@ -80,4 +81,4 @@ describe('total likes', () => {
         const result = listHelper.totalLikes(montaBlogia)
         assert.strictEqual(result, 36)
     })
-})
+  })
