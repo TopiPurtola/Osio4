@@ -9,7 +9,7 @@ if (process.argv.length < 3) {
   const password = process.argv[2]
 
 
-const url = `mongodb+srv://topipurtola:${password}@cluster0.lv3pn.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`
+const url = `mongodb+srv://topipurtola:${password}@cluster0.5wrdi.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`
 mongoose.set('strictQuery', false)
 mongoose.connect(url).then(() => {
   const blogSchema = new mongoose.Schema({
