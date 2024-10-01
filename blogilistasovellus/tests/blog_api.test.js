@@ -4,30 +4,17 @@ const Blog = require('../models/blog')
 const mongoose = require('mongoose')
 const supertest = require('supertest')
 const app = require('../app')
+const testhelper = require('./testhelper')
 
 const api = supertest(app)
 
-const initialBlogs = [
-    {
-    title: 'Spongebob Squigglepants',
-    author: 'NintendoDS',
-    url: 'sponke.fi',
-    likes: 467,
-    },
-    {
-    title: 'Käräjät Kehäkivillä',
-    author: 'hassu taulu',
-    url: 'seinätaulut.fi',
-    likes: 353,
-    },
-]
 
 beforeEach(async () => {
     await Blog.deleteMany({})
 
-    let blogObject = new Blog(initialBlogs[0])
+    let blogObject = new Blog(testhelper.initialBlogs[0])
     await blogObject.save()
-    blogObject = new Blog(initialBlogs[1])
+    blogObject = new Blog(testhelper.initialBlogs[1])
     await blogObject.save()
   })
 
@@ -70,10 +57,26 @@ beforeEach(async () => {
   
     const titles = response.body.map(r => r.title)
   
-    assert.strictEqual(response.body.length, initialBlogs.length + 1)
+    assert.strictEqual(response.body.length, testhelper.initialBlogs.length + 1)
   
     assert(titles.includes('Toimi'))
   })
+
+  test('a blog can be removed'), async () => {
+    const blogsAtStart = testhelper.initialBlogs
+    const blogToDelete = blogsAtStart[0]
+
+    await api
+        .delete(`/api/notes/${blogToDelete.id}`)
+        .expect(204)
+
+    const blogsAtEnd = await testhelper.blogsInDb()
+
+    assert.strictEqual(blogsAtEnd.length, testhelper.initialBlogs.length -1)
+        
+    const contents = blogsAtEnd.map(r => r.title)
+    assert(!contents.includes(blogToDelete.title))    
+  }
 
 
   after(async() =>{
