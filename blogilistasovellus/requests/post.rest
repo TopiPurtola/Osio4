@@ -1,9 +1,10 @@
 POST http://localhost:3003/api/blogs
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IlBldGUiLCJpZCI6IjY3MGJiMzYzNDU5NzJlNWRlMGRiYzJiZCIsImlhdCI6MTcyODgyMDA3N30.9Lai2PJ58tT5aixJuHW8PGiguO2av-A9DIGF_pnbSWU
 
 {
-  "title": "Aika Hyvä Viini",
-  "author": "Huttunen",
-  "url": "www.Huttunen.fi",
-  "likes": "420"
+  "title": "Huonot Juomat",
+  "author": "Taxi",
+  "url": "www.Pete.fi",
+  "likes": "-5343"
 }
