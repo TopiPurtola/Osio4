@@ -1,12 +1,15 @@
 import { useEffect, useState } from "react"
 import yhteys from "./yhteys"
 import loginService from '../services/login.js'
+import Notification from "../../components/notification.jsx"
+import blogService from "../services/blogs.js"
 
 const App = () => {
 
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
+  const [errorMessage, setErrorMessage] = useState(null)
 
   const [blogit, setBlogit] = useState([]); // Alustetaan tyhjä taulukko
   
@@ -19,6 +22,12 @@ const handleLogin = async (event) => {
       const user = await loginService.login({
         username, password,
       })
+
+
+      window.localStorage.setItem(
+        'loggedBlogUser', JSON.stringify(user)
+      )
+      
       setUser(user)
       setUsername('')
       setPassword('')
@@ -29,6 +38,20 @@ const handleLogin = async (event) => {
       }, 5000)
     }
   }
+
+  const logOut = () =>{
+    window.localStorage.removeItem('loggedBlogUser')
+    setUser(null);
+  }
+
+  useEffect(() => {
+    const loggedUserJSON = window.localStorage.getItem('loggedBlogUser')
+    if (loggedUserJSON) {
+      const user = JSON.parse(loggedUserJSON)
+      setUser(user)
+      blogService.setToken(user.token)
+    }
+  }, [])
 
   useEffect(() => {
     yhteys.getAll()
@@ -66,6 +89,7 @@ const handleLogin = async (event) => {
       <div>
         <button type="submit" onClick={handleLogin}>Kirjaudu</button>
       </div>
+      <Notification message={errorMessage}/>
       </div>
     )
   }
@@ -73,7 +97,9 @@ const handleLogin = async (event) => {
   return (
     <div>
       <h1>Blogitekstisovellus!! Wuhuu!</h1>
-      Kirjauduttu sisään käyttäjällä {user.username}
+      
+      Kirjauduttu sisään käyttäjällä {user.username}<br/>
+      <button onClick={logOut}>Kirjaudu Ulos</button>
       <h3>Siistit Blogit!!</h3>
       <ul>
         {blogit.map(blogi => (
