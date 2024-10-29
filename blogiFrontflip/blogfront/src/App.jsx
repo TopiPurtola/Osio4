@@ -13,6 +13,11 @@ const App = () => {
 
   const [blogit, setBlogit] = useState([]); // Alustetaan tyhjä taulukko
   
+  const [newBlog, setNewBlog] = useState({
+    title: '',
+    author: '',
+    url: ''
+  })
 
 
 const handleLogin = async (event) => {
@@ -37,6 +42,25 @@ const handleLogin = async (event) => {
         setErrorMessage(null)
       }, 5000)
     }
+  }
+
+  const createBlog = (event) =>{
+    event.preventDefault()
+    const blogObject = {
+      title: newBlog.title,
+      author: newBlog.author,
+      url: newBlog.url,
+      likes: 0
+    }
+    blogService.create(blogObject).then(returnedBlog => {
+      setBlogit(blogit.concat(returnedBlog))
+      setNewBlog({title: '', author: '', url: ''});
+    }) 
+  }
+
+  const handleBlogChange = (event) =>{
+    const {name, value} = event.target;
+    setNewBlog({...newBlog, [name]: value}) 
   }
 
   const logOut = () =>{
@@ -106,6 +130,17 @@ const handleLogin = async (event) => {
           <li key={blogi.id}>{blogi.title} - {blogi.author} - {blogi.likes} tykkäystä <button onClick={() => handleClick(blogi.id)}>Delete</button></li>
         ))}
       </ul>
+      <div>
+        <h3>Luo uusi blogi</h3>
+        <form onSubmit={createBlog}>
+          Otsikko: <input type="text" value={newBlog.title} name='title' onChange={handleBlogChange}/> <br />
+          Tekijä: <input type="text" value={newBlog.author} name='author' onChange={handleBlogChange}/> <br />
+          Url: <input type="text" value={newBlog.url} name='url' onChange={handleBlogChange}/> <br />
+          <button type="submit">Postaa Blogi</button>
+        </form>
+        
+
+      </div>
     </div>
   )
 }
