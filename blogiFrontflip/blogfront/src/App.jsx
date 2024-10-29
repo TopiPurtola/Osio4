@@ -3,6 +3,7 @@ import yhteys from "./yhteys"
 import loginService from '../services/login.js'
 import Notification from "../../components/notification.jsx"
 import blogService from "../services/blogs.js"
+import "./index.css"
 
 const App = () => {
 
@@ -10,7 +11,9 @@ const App = () => {
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
   const [errorMessage, setErrorMessage] = useState(null)
-
+  const [successMessage, setSuccessMessage] = useState(null)
+  const [messageType, setMessageType] = useState('')
+  
   const [blogit, setBlogit] = useState([]); // Alustetaan tyhjä taulukko
   
   const [newBlog, setNewBlog] = useState({
@@ -36,8 +39,14 @@ const handleLogin = async (event) => {
       setUser(user)
       setUsername('')
       setPassword('')
+      setSuccessMessage('Kirjautuminen onnistui!')
+      setMessageType('success')
+      setTimeout(() => {
+        setSuccessMessage(null)
+      }, 5000)
     } catch (exception) {
-      setErrorMessage('wrong credentials')
+      setErrorMessage('Virheellinen käyttäjätunnus tai salasana')
+      setMessageType('error')
       setTimeout(() => {
         setErrorMessage(null)
       }, 5000)
@@ -46,6 +55,7 @@ const handleLogin = async (event) => {
 
   const createBlog = (event) =>{
     event.preventDefault()
+    
     const blogObject = {
       title: newBlog.title,
       author: newBlog.author,
@@ -56,6 +66,14 @@ const handleLogin = async (event) => {
       setBlogit(blogit.concat(returnedBlog))
       setNewBlog({title: '', author: '', url: ''});
     }) 
+
+    setSuccessMessage('Blogi "'+ newBlog.title + '" tekijältä "' +newBlog.author + '" lisätty onnistuneesti!' )
+    setMessageType('success')
+      setTimeout(() => {
+        setSuccessMessage(null)
+      }, 5000)
+
+    
   }
 
   const handleBlogChange = (event) =>{
@@ -66,6 +84,11 @@ const handleLogin = async (event) => {
   const logOut = () =>{
     window.localStorage.removeItem('loggedBlogUser')
     setUser(null);
+    setSuccessMessage('Kirjauduttu ulos!')
+    setMessageType('success')
+      setTimeout(() => {
+        setSuccessMessage(null)
+      }, 5000)
   }
 
   useEffect(() => {
@@ -113,7 +136,8 @@ const handleLogin = async (event) => {
       <div>
         <button type="submit" onClick={handleLogin}>Kirjaudu</button>
       </div>
-      <Notification message={errorMessage}/>
+      <Notification message={errorMessage} type={messageType}/>
+      <Notification message={successMessage} type={messageType}/>
       </div>
     )
   }
@@ -121,8 +145,8 @@ const handleLogin = async (event) => {
   return (
     <div>
       <h1>Blogitekstisovellus!! Wuhuu!</h1>
-      
       Kirjauduttu sisään käyttäjällä {user.username}<br/>
+      <Notification message={successMessage} type={messageType}/>
       <button onClick={logOut}>Kirjaudu Ulos</button>
       <h3>Siistit Blogit!!</h3>
       <ul>
