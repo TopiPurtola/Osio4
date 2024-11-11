@@ -13,6 +13,7 @@ const App = () => {
   const [errorMessage, setErrorMessage] = useState(null)
   const [successMessage, setSuccessMessage] = useState(null)
   const [messageType, setMessageType] = useState('')
+  const [visibleCreation, setVisibleCreation] =useState(null)
   
   const [blogit, setBlogit] = useState([]); // Alustetaan tyhjä taulukko
   
@@ -72,8 +73,8 @@ const handleLogin = async (event) => {
       setTimeout(() => {
         setSuccessMessage(null)
       }, 5000)
-
-    
+      
+      setVisibleCreation(false)
   }
 
   const handleBlogChange = (event) =>{
@@ -121,6 +122,39 @@ const handleLogin = async (event) => {
       });
   }
 
+  const naytaLoki = () =>{
+    if(visibleCreation === true){
+      setVisibleCreation(false)
+    }
+    else{
+      setVisibleCreation(true)
+    }
+    
+  }
+
+  const lokinLuonti = () =>{
+    if(visibleCreation === true){
+      return(
+       <div>
+          <h3>Luo uusi blogi</h3>
+          <form onSubmit={createBlog}>
+            Otsikko: <input type="text" value={newBlog.title} name='title' onChange={handleBlogChange}/> <br />
+            Tekijä: <input type="text" value={newBlog.author} name='author' onChange={handleBlogChange}/> <br />
+            Url: <input type="text" value={newBlog.url} name='url' onChange={handleBlogChange}/> <br />
+            <button type="submit">Postaa Blogi</button>
+            <button type="button" onClick={naytaLoki}>Perruuta</button>
+          </form>
+        </div>
+      )
+    }
+    else{
+      return(
+        <div>
+          <button onClick={naytaLoki}>Luo Blogi</button>
+        </div>
+      )
+    }
+  }
   if (user === null){
     return(
       <div>
@@ -154,17 +188,7 @@ const handleLogin = async (event) => {
           <li key={blogi.id}>{blogi.title} - {blogi.author} - {blogi.likes} tykkäystä <button onClick={() => handleClick(blogi.id)}>Delete</button></li>
         ))}
       </ul>
-      <div>
-        <h3>Luo uusi blogi</h3>
-        <form onSubmit={createBlog}>
-          Otsikko: <input type="text" value={newBlog.title} name='title' onChange={handleBlogChange}/> <br />
-          Tekijä: <input type="text" value={newBlog.author} name='author' onChange={handleBlogChange}/> <br />
-          Url: <input type="text" value={newBlog.url} name='url' onChange={handleBlogChange}/> <br />
-          <button type="submit">Postaa Blogi</button>
-        </form>
-        
-
-      </div>
+      {lokinLuonti()}
     </div>
   )
 }
