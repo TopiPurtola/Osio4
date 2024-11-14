@@ -14,6 +14,12 @@ const App = () => {
   const [successMessage, setSuccessMessage] = useState(null);
   const [messageType, setMessageType] = useState("");
   const [blogit, setBlogit] = useState([]);
+  
+  // Tila, joka seuraa näkyykö blogin lisätiedot
+  const [visibleDetails, setVisibleDetails] = useState({});
+  
+  // Tila, joka hallitsee, näkyykö blogin luomisen lomake
+  const [visibleCreation, setVisibleCreation] = useState(false);
 
   const handleLogin = async (event) => {
     event.preventDefault();
@@ -82,6 +88,30 @@ const App = () => {
       });
   };
 
+  // Funktio, joka vaihtaa blogin näkyvyysstatusta
+  const toggleDetails = (id) => {
+    setVisibleDetails((prevState) => ({
+      ...prevState,
+      [id]: !prevState[id],
+    }));
+  };
+
+  // Funktio, joka vaihtaa lomakkeen näkyvyyden
+  const toggleCreation = () => {
+    setVisibleCreation((prevState) => !prevState);
+  };
+
+  // Tyylit blogille, rajaukset mukaan
+  const blogStyle = {
+    paddingTop: 10,
+    paddingLeft: 2,
+    border: "solid",
+    borderWidth: 2,
+    borderColor: "black", // Musta reuna
+    marginBottom: 5,
+    marginTop: 5,
+  };
+
   return (
     <div>
       <h1>Blogitekstisovellus!! Wuhuu!</h1>
@@ -119,18 +149,34 @@ const App = () => {
           <h3>Siistit Blogit!!</h3>
           <ul>
             {blogit.map((blogi) => (
-              <li key={blogi.id}>
-                {blogi.title} - {blogi.author} - {blogi.likes} tykkäystä
-                <button onClick={() => handleClick(blogi.id)}>Delete</button>
+              <li key={blogi.id} style={blogStyle}> {/* Lisää tyylit tänne */}
+                {blogi.title}{" "}
+                <button onClick={() => toggleDetails(blogi.id)}>
+                  {visibleDetails[blogi.id] ? "Pienennä" : "Näytä Lisää"}
+                </button>
+                {visibleDetails[blogi.id] && (
+                  <div>
+                    <p>Tekijä: {blogi.author}</p> {/* Tekijä näkyy vain lisätiedoissa */}
+                    <p>URL: {blogi.url}</p>
+                    <p>Tykkäykset: {blogi.likes} </p>
+                    <button onClick={() => {}}>Tykkää</button> {/* Tykkää nappi */}
+                    <button onClick={() => handleClick(blogi.id)}>Poista</button>
+                  </div>
+                )}
               </li>
             ))}
           </ul>
-          <BlogForm 
-            setBlogit={setBlogit} 
-            blogit={blogit} 
-            setSuccessMessage={setSuccessMessage} 
-            setMessageType={setMessageType}
-          /> 
+
+          {/* Näytetään blogin luontilomake vain, jos visibleCreation on true */}
+          <button onClick={toggleCreation}>{visibleCreation ? "Peruuta" : "Luo Blogi"}</button>
+          {visibleCreation && (
+            <BlogForm
+              setBlogit={setBlogit}
+              blogit={blogit}
+              setSuccessMessage={setSuccessMessage}
+              setMessageType={setMessageType}
+            />
+          )}
         </div>
       )}
     </div>
