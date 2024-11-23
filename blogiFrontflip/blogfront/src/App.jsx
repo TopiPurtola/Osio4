@@ -14,11 +14,7 @@ const App = () => {
   const [successMessage, setSuccessMessage] = useState(null);
   const [messageType, setMessageType] = useState("");
   const [blogit, setBlogit] = useState([]);
-  
-  // Tila, joka seuraa näkyykö blogin lisätiedot
   const [visibleDetails, setVisibleDetails] = useState({});
-  
-  // Tila, joka hallitsee, näkyykö blogin luomisen lomake
   const [visibleCreation, setVisibleCreation] = useState(false);
 
   const handleLogin = async (event) => {
@@ -88,7 +84,6 @@ const App = () => {
       });
   };
 
-  // Funktio, joka vaihtaa blogin näkyvyysstatusta
   const toggleDetails = (id) => {
     setVisibleDetails((prevState) => ({
       ...prevState,
@@ -96,18 +91,45 @@ const App = () => {
     }));
   };
 
-  // Funktio, joka vaihtaa lomakkeen näkyvyyden
   const toggleCreation = () => {
     setVisibleCreation((prevState) => !prevState);
   };
 
-  // Tyylit blogille, rajaukset mukaan
+  const handleLike = async (blogi) => {
+    try {
+      const updatedBlog = {
+        user: blogi.user.id || blogi.user, // Backend vaatii pelkän user ID:n
+        likes: blogi.likes + 1,
+        author: blogi.author,
+        title: blogi.title,
+        url: blogi.url,
+      };
+      const response = await blogService.update(blogi.id, updatedBlog);
+
+      setBlogit(blogit.map((b) => (b.id === blogi.id ? response : b)));
+      setSuccessMessage(`Tykkäsit blogista "${blogi.title}"!`);
+      setMessageType("success");
+      setTimeout(() => {
+        setSuccessMessage(null);
+        setMessageType("");
+      }, 5000);
+    } catch (error) {
+      console.error("Error updating likes:", error);
+      setErrorMessage("Tykkäyksen päivitys epäonnistui.");
+      setMessageType("error");
+      setTimeout(() => {
+        setErrorMessage(null);
+        setMessageType("");
+      }, 5000);
+    }
+  };
+
   const blogStyle = {
     paddingTop: 10,
     paddingLeft: 2,
     border: "solid",
     borderWidth: 2,
-    borderColor: "black", // Musta reuna
+    borderColor: "black",
     marginBottom: 5,
     marginTop: 5,
   };
@@ -149,17 +171,19 @@ const App = () => {
           <h3>Siistit Blogit!!</h3>
           <ul>
             {blogit.map((blogi) => (
-              <li key={blogi.id} style={blogStyle}> {/* Lisää tyylit tänne */}
+              <li key={blogi.id} style={blogStyle}>
                 {blogi.title}{" "}
                 <button onClick={() => toggleDetails(blogi.id)}>
                   {visibleDetails[blogi.id] ? "Pienennä" : "Näytä Lisää"}
                 </button>
                 {visibleDetails[blogi.id] && (
                   <div>
-                    <p>Tekijä: {blogi.author}</p> {/* Tekijä näkyy vain lisätiedoissa */}
+                    <p>Tekijä: {blogi.author}</p>
                     <p>URL: {blogi.url}</p>
-                    <p>Tykkäykset: {blogi.likes} </p>
-                    <button onClick={() => {}}>Tykkää</button> {/* Tykkää nappi */}
+                    <p>
+                      Tykkäykset: {blogi.likes}{" "}
+                      <button onClick={() => handleLike(blogi)}>Tykkää</button>
+                    </p>
                     <button onClick={() => handleClick(blogi.id)}>Poista</button>
                   </div>
                 )}
@@ -167,7 +191,6 @@ const App = () => {
             ))}
           </ul>
 
-          {/* Näytetään blogin luontilomake vain, jos visibleCreation on true */}
           <button onClick={toggleCreation}>{visibleCreation ? "Peruuta" : "Luo Blogi"}</button>
           {visibleCreation && (
             <BlogForm
